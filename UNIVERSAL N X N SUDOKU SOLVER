@@ -1,0 +1,104 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Oct 12 16:23:37 2019
+
+@author: satyaudaysanku
+"""
+#UNIVERSAL NXN SUDOKU SOLVER USING BACK TRACKING AND BRUTEFORCE METHOD
+import math
+file = open ("o.txt","r")
+count = 0
+for line in file :
+   parts = line.split()
+   count +=1
+SIZE = count
+p=int(math.sqrt(count))
+
+if p**2 == count:
+      u=p
+else:
+    u=1
+#sudoku problem
+#Blocks with value 0 are vacant Blocks
+with open('o.txt', 'r') as f:
+    matrix = [[int(num) for num in line.split(',')] for line in f]
+print("UNSOLVED SUDOKU\n")
+for i in matrix:
+    print(i)
+print("Solution:- REPLACE ZEROS WITH APPROPRIATE VALUES\n")    
+print("\n\n\n\n")    
+#function to print sudoku
+def Final_sudoku():
+    print("FINAL SOLVED SUDOKU\n")
+    for i in matrix:
+        print (i)
+
+#function to check if all Blocks are assigned or not
+#if there is any unassigned Block
+#then this function will change the values of rows and columns accordingly
+def initially_zero(row, col):
+    num_unassign = 0
+    for i in range(SIZE):
+        for j in range (SIZE):
+            #Block is unassigned
+            if matrix[i][j] == 0:
+                row = i
+                col = j
+                num_unassign = 1
+                a = [row, col, num_unassign]
+                return a
+    a = [-1, -1, num_unassign]
+    return a
+#function to check if we can put a value in a particular Block or not
+def checking_blocks(n, r, c):
+    #checking in row
+    for i in range(SIZE):
+        #if there is a block consisting with same value
+        if matrix[r][i] == n:
+            return False
+    #checking in column
+    for i in range(SIZE):
+       #if there is a block consisting with same value
+        if matrix[i][c] == n:
+            return False
+    row_start = (r//u)*u
+    col_start = (c//u)*u
+    #checking submatrix
+    for i in range(row_start,row_start+u):
+        for j in range(col_start,col_start+u):
+            if matrix[i][j]==n:
+                return False
+    return True
+
+#function to check if we can put a value in a particular block or not
+def backtracking_sudoku():
+    Rows = 0
+    Columns = 0
+    #if all blocks are assigned then the sudoku is already solved
+    #pass by reference because initially_zero will change the values of rows and columns
+    a = initially_zero(Rows, Columns)
+    if a[2] == 0:
+        return True
+    Rows = a[0]
+    Columns = a[1]
+    #sudoku values between 1 to number of rows in a matrix +1
+    for i in range(1,count+1):
+        #if we can assign i to the block or not
+        #the block is matrix[Rows][Columns]
+        if checking_blocks(i, Rows, Columns):
+            matrix[Rows][Columns] = i
+            #backtracking
+            if backtracking_sudoku():
+                return True
+            #if we can't proceed with this solution reassign the block to zero
+            matrix[Rows][Columns]=0
+    return False
+
+
+if backtracking_sudoku():
+    Final_sudoku()
+else:
+    print("OOPS !!!!!!!!!!")
+    print(" Sudoku is not possible ")
+
